@@ -1,2 +1,1 @@
-# taskrabbit-assessment
-taskrabbit-assessment
+Data science and analytics challanges
