@@ -527,8 +527,9 @@ inner join
 	 where new_subscriber = 1
 	 )b on a.customer_id = b.customer_id
 )a  
-where subscription_product = 'Plus'
---signup_type = 'Appstore'
+where 
+--subscription_product = 'Plus'
+signup_type = 'Buy Now'
 group by subscription_month
 order by 1;
 
@@ -544,4 +545,217 @@ from
 	 from dbo.intuit_case_study 
 	 where new_subscriber = 1
 	 and subscription_month < '2016-12-01')a 
-	 group by product, signup_type;
+	 group by product, signup_type
+
+select * from (
+select *, row_number() over (partition by product order by subs desc) as rno 
+from 
+(
+select product,
+channel,
+	   count(distinct customer_id) subs
+from 
+(select customer_id, 
+	 	    product,
+	 	    Signup_type,
+	 	    channel 
+	 from dbo.intuit_case_study 
+	 where new_subscriber = 1
+	 and subscription_month < '2016-12-01')a 
+	 group by product, channel
+)g
+)h
+where h.rno = 1
+
+
+Simple Start	OA	166
+Plus	OA	98
+Essentials	OA	86
+
+select channel, 
+		count(distinct case when signup_type = 'AppStore' then customer_id end) as appstore_subscriptions,
+		count(distinct case when signup_type = 'Buy Now' then customer_id end) as buynow_subscriptions,
+		count(distinct case when signup_type = 'Retail' then customer_id end) as retail_subscriptions,
+		count(distinct case when signup_type = 'Trial' then customer_id end) as trial_subscriptions,
+		count(distinct case when signup_type = 'Wholesale' then customer_id end) as wholesale_subscriptions		 
+from dbo.intuit_case_study  
+where new_subscriber = 1 
+group by month_of 
+order by 1;
+
+
+
+select month_of,
+	   count(distinct case when product = 'Plus' then customer_id end) as plus_users,
+	   count(distinct case when product = 'Essentials' then customer_id end) as essentials_users,
+	   count(distinct case when product = 'Simple Start' then customer_id end) as simple_start_users
+from dbo.intuit_case_study    
+where new_subscriber = 1 and channel = 'Acct Assisted Sales' 
+group by month_of 
+order by 1;
+
+select * from 
+(
+select *,
+		row_number() over(partition by channel order by new_subs desc) as rno 
+from 
+(
+select channel,
+	   product,
+	   count(distinct customer_id) as new_subs 
+from dbo.intuit_case_study
+where new_subscriber = 1 
+group by channel , product
+)a
+)b 
+where b.rno = 1
+
+
+select year(month_of),
+	   cha,
+	   count(distinct customer_id) as new_subs 
+from dbo.intuit_case_study
+--where new_subscriber = 1 
+group by year(month_of), channel
+
+
+select year(month_of),
+	   product,
+	   avg(distinct revenue) as rev 
+from dbo.intuit_case_study
+--where new_subscriber = 1 
+where revenue > 0
+group by year(month_of), product;
+
+
+select subscription_month,
+	   avg(revenue) as subscribed_customers,
+	   avg(case when datediff(month,subscription_month, month_of) = 1 and open_subscriber = 1 then  revenue end) as M1_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 2 and open_subscriber = 1 then  revenue end) as M2_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 3 and open_subscriber = 1 then  revenue end) as M3_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 4 and open_subscriber = 1 then  revenue end) as M4_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 5 and open_subscriber = 1 then  revenue end) as M5_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 6 and open_subscriber = 1 then  revenue end) as M6_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 7 and open_subscriber = 1 then  revenue end) as M7_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 8 and open_subscriber = 1 then  revenue end) as M8_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 9 and open_subscriber = 1 then  revenue end) as M9_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 10 and open_subscriber = 1 then revenue end) as M10_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 11 and open_subscriber = 1 then revenue end) as M11_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 12 and open_subscriber = 1 then revenue end) as M12_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 13 and open_subscriber = 1 then revenue end) as M13_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 14 and open_subscriber = 1 then revenue end) as M14_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 15 and open_subscriber = 1 then revenue end) as M15_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 16 and open_subscriber = 1 then revenue end) as M16_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 17 and open_subscriber = 1 then revenue end) as M17_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 18 and open_subscriber = 1 then revenue end) as M18_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 19 and open_subscriber = 1 then revenue end) as M19_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 20 and open_subscriber = 1 then revenue end) as M20_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 21 and open_subscriber = 1 then revenue end) as M21_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 22 and open_subscriber = 1 then revenue end) as M22_revenue,
+	   avg(case when datediff(month,subscription_month, month_of) = 23 and open_subscriber = 1 then revenue end) as M23_revenue
+from                                                                                                             
+dbo.intuit_case_study 
+group by subscription_month
+order by 1 ;
+
+
+select customer_id ,month_of, count(*)
+from 
+dbo.intuit_case_study 
+group by customer_id ,month_of
+having count(*) > 1 
+order by 3 desc;
+
+
+select year(month_of) ,channel ,signup_type, product ,avg(revenue)
+from 
+dbo.intuit_case_study 
+where revenue > 0
+group by  year(month_of), channel, signup_type, product
+order by 1,2,3,4;
+
+
+
+select month_of ,signup_type, product ,avg(revenue)
+from 
+dbo.intuit_case_study 
+where revenue > 0 and signup_type in ('Buy Now','Wholesale','Trial') and product <> 'Simple Start'
+group by month_of, signup_type, product
+order by 1,2,3;
+
+
+
+select channel,
+       signup_type,
+       
+from 
+dbo.intuit_case_study
+where new_subscriber = 1  
+group by channel , signup_type 
+
+
+
+select signup_type,
+	   product,
+	   channel,
+	   avg(case when M1_retention > 0.0 then M1_retention end) as m1_re_avg,
+	   avg(case when M2_retention > 0.0 then M2_retention end) as m2_re_avg,
+	   avg(case when M3_retention > 0.0 then M3_retention end) as m3_re_avg,
+	   avg(case when M4_retention > 0.0 then M4_retention end) as m4_re_avg,
+	   avg(case when M5_retention > 0.0 then M5_retention end) as m5_re_avg,
+	   avg(case when M6_retention > 0.0 then M6_retention end) as m6_re_avg,
+	   avg(case when M7_retention > 0.0 then M7_retention end) as m7_re_avg,
+	   avg(case when M8_retention > 0.0 then M8_retention end) as m8_re_avg,
+	   avg(case when M9_retention > 0.0 then M9_retention end) as m9_re_avg,
+	   avg(case when M10_retention > 0.0 then M10_retention end) as m10_re_avg,
+	   avg(case when M11_retention > 0.0 then M11_retention end) as m11_re_avg,
+	   avg(case when M12_retention > 0.0 then M12_retention end) as m12_re_avg,
+	   avg(case when M13_retention > 0.0 then M13_retention end) as m13_re_avg,
+	   avg(case when M14_retention > 0.0 then M14_retention end) as m14_re_avg,
+	   avg(case when M15_retention > 0.0 then M15_retention end) as m15_re_avg,
+	   avg(case when M16_retention > 0.0 then M16_retention end) as m16_re_avg,
+	   avg(case when M17_retention > 0.0 then M17_retention end) as m17_re_avg,
+	   avg(case when M18_retention > 0.0 then M18_retention end) as m18_re_avg,
+	   avg(case when M19_retention > 0.0 then M19_retention end) as m19_re_avg,
+	   avg(case when M20_retention > 0.0 then M20_retention end) as m20_re_avg,
+	   avg(case when M21_retention > 0.0 then M21_retention end) as m21_re_avg,
+	   avg(case when M22_retention > 0.0 then M22_retention end) as m22_re_avg,
+	   avg(case when M23_retention > 0.0 then M23_retention end) as m23_re_avg
+from 
+(
+select subscription_month,
+	   product, 
+	   signup_type,
+	   channel,
+	   count(distinct customer_id) as subscribed_customers,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 1 and (open_subscriber = 1 or revenue > 0)  then customer_id end)*1.00/count(distinct customer_id) as M1_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 2 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M2_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 3 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M3_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 4 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M4_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 5 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M5_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 6 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M6_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 7 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M7_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 8 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M8_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 9 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M9_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 10 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M10_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 11 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M11_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 12 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M12_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 13 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M13_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 14 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M14_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 15 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M15_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 16 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M16_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 17 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M17_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 18 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M18_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 19 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M19_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 20 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M20_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 21 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M21_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 22 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M22_retention,
+	   count(distinct case when datediff(month,subscription_month, month_of) = 23 and (open_subscriber = 1 or revenue > 0) then customer_id end)*1.00/count(distinct customer_id) as M23_retention
+from                                                                                                             
+dbo.intuit_case_study 
+where channel = 'Inside Sales'
+group by subscription_month, product, signup_type, channel
+--order by 1 ;
+)a
+group by signup_type, product, channel 
+order by 1,2 
